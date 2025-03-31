@@ -298,7 +298,7 @@ func (s *Handlers) storeImage(image []byte) (filePath string, err error) {
 
 	// - build image file path
 	fileName := fmt.Sprintf("%s.jpg", hashStr)
-	filePath = filepath.Join(s.imgDirPath, fileName)
+	filePath = filepath.Join("/mnt/images", fileName)  // ボリュームのパス
 
 	// - check if the image already exists
 	if _, err := os.Stat(filePath); err == nil {

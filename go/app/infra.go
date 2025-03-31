@@ -49,7 +49,7 @@ type itemRepository struct {
 // NewItemRepository creates a new itemRepository.
 func NewItemRepository() ItemRepository {
 	return &itemRepository{
-		dbPath: "./db/mercari.sqlite3",
+		dbPath: "/mnt/data/mercari.sqlite3", // ボリュームのパス
 		// fileName: "items.json"
 	}
 }
