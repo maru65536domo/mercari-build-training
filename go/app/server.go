@@ -173,12 +173,12 @@ func parseAddItemRequest(r *http.Request) (*AddItemRequest, error) {
 	// STEP 4-4: add an image field
 	f, _, err := r.FormFile("image")
 	if err != nil {
-		return nil, errors.New("Failed to read form file")
+		return nil, errors.New("failed to read form file")
 	}
 	defer f.Close()
 	b, err := io.ReadAll(f)
 	if err != nil {
-		return nil, errors.New("Failed to read image data")
+		return nil, errors.New("failed to read image data")
 	}
 	req.Image = b
 	// validate the request
@@ -280,8 +280,8 @@ func (s *Handlers) SearchItems(w http.ResponseWriter, r *http.Request) {
 	for i, item := range items {
 		resItems[i] = itemToItemResponse(item)
 	}
-	resp := ItemsResponse{Items: resItems}
-	err = json.NewEncoder(w).Encode(resp)
+	// resp := ItemsResponse{Items: resItems}
+	// err = json.NewEncoder(w).Encode(resp)
 }
 
 
@@ -298,18 +298,20 @@ func (s *Handlers) storeImage(image []byte) (filePath string, err error) {
 
 	// - build image file path
 	fileName := fmt.Sprintf("%s.jpg", hashStr)
-	filePath = filepath.Join("/mnt/images", fileName)  // ボリュームのパス
+	filePath = filepath.Join(s.imgDirPath, fileName)
 
-	// - check if the image already exists
-	if _, err := os.Stat(filePath); err == nil {
-		return filePath, nil
-	} else if !os.IsNotExist(err) {
-		return "", fmt.Errorf("error checking image exsistence: %s", err)
+	// 保存先のディレクトリが存在しない場合は作成する
+	if _, err := os.Stat(s.imgDirPath); os.IsNotExist(err) {
+		if err := os.MkdirAll(s.imgDirPath, 0755); err != nil {
+			return "", fmt.Errorf("failed to create directory: %w", err)
+		}
+	} else if err != nil {
+		return "", fmt.Errorf("failed to check directory existence: %w", err)
 	}
 
-	// - store image
-	if err := StoreImage(filePath, image); err != nil {
-		return "", fmt.Errorf("failed to store image: %s", err)
+	// 画像ファイルを保存する
+	if err := os.WriteFile(filePath, image, 0644); err != nil {
+		return "", fmt.Errorf("failed to store image: %w", err) // エラーをラップ
 	}
 
 	// - return the image file path

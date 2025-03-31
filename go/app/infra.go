@@ -14,7 +14,7 @@ import (
 
 var (
 	errImageNotFound = errors.New("image not found")
-	errItemsNotFound = errors.New("item not found")
+	// errItemsNotFound = errors.New("item not found")
 )
 
 type Items struct {
@@ -159,7 +159,7 @@ func (i *itemRepository) SearchFromName(ctx context.Context, name string) ([]*It
 	return items, nil
 }
 
-func (i *itemRepository) getItemsFromFile(ctx context.Context) ([]*Item, error) {
+func (i *itemRepository) getItemsFromFile(context.Context) ([]*Item, error) {
 	var items Items
 	if _, err := os.Stat(i.fileName); err == nil {
 		// File exists, open it for reading

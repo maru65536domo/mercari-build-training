@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Goアプリケーションのサービス
   app:
     build:
       context: .
@@ -8,12 +9,19 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./app:/app
-    environment:
-      - FRONT_URL=http://localhost:3000
+      - ./db:/app/db
+      - ./images:/app/images # imagesディレクトリをマウント
     depends_on:
-      - db
-  db:
-    image: sqlite:3
+      - sqlite
+    environment:
+      DB_PATH: /app/db/database.sqlite
+    restart: always
+
+  # SQLiteサービス (Alpine Linuxを使用)
+  sqlite:
+    image: alpine:latest # イメージ名を修正
+    container_name: sqlite
+    command: ["sqlite3", "/data/db.sqlite"]
     volumes:
-      - ./db:/db
+      - ./db:/data
+    restart: always
